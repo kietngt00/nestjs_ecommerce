@@ -1,6 +1,8 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { AdminGuard } from 'src/auth/admin.guard';
 import { ProductDto } from './dto/product.dto';
-import { Product } from './product.entity';
+import { Product } from './product.schema'
 import { ProductService } from './product.service';
 
 @Controller('product')
@@ -13,26 +15,25 @@ export class ProductController {
     }
 
     @Get('/:id')
-    getById(@Param() id: string){
+    getById(@Param('id') id: string){
         return this.productService.getById(id);
     }
 
-
-    ///////////////////////////////////////////////////////////////
-    // Need login, admin role for below routes
-    ///////////////////////////////////////////////////////////////
+    @UseGuards(AuthGuard(),AdminGuard)
     @Post()
     createProduct(@Body() productDto: ProductDto):Promise<Product>{
         return this.productService.createProduct(productDto)
     }
 
+    @UseGuards(AuthGuard(),AdminGuard)
     @Patch('/:id')
-    updateProduct(@Param() id:string, @Body() productDto: ProductDto){
+    updateProduct(@Param('id') id:string, @Body() productDto: ProductDto){
         return this.productService.updateProduct(id, productDto)
     }
 
+    @UseGuards(AuthGuard(),AdminGuard)
     @Delete('/:id')
-    deleteProduct(@Param() id:string){
+    deleteProduct(@Param('id') id:string){
         return this.productService.deleteProduct(id);
     }
 
